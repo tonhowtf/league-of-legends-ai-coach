@@ -1,6 +1,16 @@
 package main
 
-import "github.com/tonhowtf/lol-agent/internal/lcu"
+import (
+	"fmt"
+
+	"github.com/tonhowtf/lol-agent/internal/lcu"
+)
 func main() {
-	lcu.GetLockFile()
+	lockfile := lcu.GetLockFile()
+	
+	creds := lcu.ParseLockFile(lockfile)
+
+	fmt.Println(*creds)
+
+
 }

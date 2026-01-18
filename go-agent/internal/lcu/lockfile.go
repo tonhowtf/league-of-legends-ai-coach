@@ -1,20 +1,39 @@
 package lcu
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
-func GetLockFile() {
+type LCUCredentials struct {
+	ProcessName string
+	PID string
+	Port string
+	Password string
+	Protocol string
+}
+
+func ParseLockFile(items string) *LCUCredentials{
+	lockFileParts := strings.Split(string(items), ":")
+
+	return &LCUCredentials{
+		ProcessName: lockFileParts[0],
+		PID: lockFileParts[1],
+		Port: lockFileParts[2],
+		Password: lockFileParts[3],
+		Protocol: lockFileParts[4],
+	}
+}
+
+
+func GetLockFile() string {
 	cmd := exec.Command("powershell", "-NoProfile", "-Command", "(Get-Process LeagueClientUx).Path")
 	output, err := cmd.Output()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(output))
-
 	path := GetDir(string(output))
 
 	lockfile, err := ReadLockFile(path)
@@ -23,7 +42,7 @@ func GetLockFile() {
 		panic(err)
 	}
 
-	println(string(lockfile))
+	return string(lockfile)
 }
 
 func GetDir(leagueUX string) string {
