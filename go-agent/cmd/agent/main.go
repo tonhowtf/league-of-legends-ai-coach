@@ -1,16 +1,10 @@
 package main
 
-import (
-	"fmt"
+//http.Get(creds.Protocol + "://" + "127.0.0.1:" + creds.Port)
+import "github.com/tonhowtf/lol-agent/internal/lcu"
 
-	"github.com/tonhowtf/lol-agent/internal/lcu"
-)
 func main() {
-	lockfile := lcu.GetLockFile()
 	
-	creds := lcu.ParseLockFile(lockfile)
-
-	fmt.Println(*creds)
-
+	println(lcu.LOLREQ("/riotclient/region-locale"))
 
 }
