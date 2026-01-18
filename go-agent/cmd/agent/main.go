@@ -13,4 +13,6 @@ func main() {
 	data, _ := client.MakeRequest("/riotclient/region-locale")
 	println(string(data))
 
+	client.ConnectWebSocket()
+
 }
