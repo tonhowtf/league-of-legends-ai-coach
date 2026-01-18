@@ -2,19 +2,20 @@ package lcu
 
 import (
 	"crypto/tls"
+	"fmt"
 	"io"
 	"net/http"
 )
 
+type Client struct {
+	creds *LCUCredentials
+	httpClient *http.Client
+}
 
-func LOLREQ(endpoint string) string {
 
+func NewClient() (*Client, error) {
 	lockfile := GetLockFile()
-	
 	creds := ParseLockFile(lockfile)
-	
-	url := creds.Protocol + "://" + "127.0.0.1:" + creds.Port + endpoint
-
 
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -22,27 +23,30 @@ func LOLREQ(endpoint string) string {
 		},
 	}
 
-	client := &http.Client{
-		Transport: transport,
-	}
+	return &Client{
+		creds: creds,
+		httpClient: &http.Client{Transport: transport},
+	}, nil
+}
 
-	req, err := http.NewRequest("get", url, nil)
-	if err != nil {
-		panic(err)
-	}
+
+func (c *Client) MakeRequest(endpoint string) ([]byte, error) {	
 	
-	req.SetBasicAuth("riot", creds.Password)
+	
+	url := fmt.Sprintf("%s://127.0.0.1:%s%s", c.creds.Protocol, c.creds.Port, endpoint)
 
-	resp, err := client.Do(req)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+
+	req.SetBasicAuth("riot", c.creds.Password)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	return string(body)
+	return io.ReadAll(resp.Body)
 }

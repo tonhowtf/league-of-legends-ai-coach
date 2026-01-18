@@ -5,6 +5,12 @@ import "github.com/tonhowtf/lol-agent/internal/lcu"
 
 func main() {
 	
-	println(lcu.LOLREQ("/riotclient/region-locale"))
+	client, err := lcu.NewClient()
+	if err != nil {
+		panic(err)
+	}
+
+	data, _ := client.MakeRequest("/riotclient/region-locale")
+	println(string(data))
 
 }
